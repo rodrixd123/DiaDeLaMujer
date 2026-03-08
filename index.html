@@ -135,8 +135,9 @@ Nunca olvides lo valiosa que eres ni todo lo que puedes lograr.
 </div>
 </div>
 
-<audio autoplay loop>
-<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_4f2c6e5f42.mp3" type="audio/mpeg">
+<!-- AUDIO LOCAL -->
+<audio id="musica" loop preload="auto">
+<source src="musica.mp3" type="audio/mpeg">
 </audio>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -347,15 +348,18 @@ renderer.setSize(window.innerWidth,window.innerHeight)
 })
 
 ////////////////////////
-// BOTON CARTA
+// BOTON CARTA + MUSICA
 ////////////////////////
 
 const btnCarta = document.getElementById("btnCarta")
 const carta = document.getElementById("carta")
 const cerrarCarta = document.getElementById("cerrarCarta")
+const musica = document.getElementById("musica")
 
 btnCarta.onclick = ()=>{
 carta.style.display = "flex"
+musica.currentTime = 0
+musica.play().catch(()=>{})
 }
 
 cerrarCarta.onclick = ()=>{
