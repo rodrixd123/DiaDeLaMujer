@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Feliz Día de la Mujer</title>
+
+<style>
+body{
+margin:0;
+overflow:hidden;
+background:black;
+font-family:Arial;
+}
+
+h1{
+position:absolute;
+top:40px;
+width:100%;
+text-align:center;
+font-size:55px;
+color:white;
+text-shadow:0 0 20px #ff66cc,0 0 40px #ff66cc;
+z-index:5;
+}
+
+.emoji{
+position:absolute;
+top:120px;
+width:100%;
+text-align:center;
+font-size:40px;
+z-index:5;
+}
+
+/* BOTON */
+
+#btnCarta{
+position:absolute;
+bottom:40px;
+left:50%;
+transform:translateX(-50%);
+padding:12px 25px;
+font-size:18px;
+background:#ff4da6;
+color:white;
+border:none;
+border-radius:25px;
+cursor:pointer;
+box-shadow:0 0 15px #ff4da6;
+z-index:10;
+}
+
+/* CARTA */
+
+#carta{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.7);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:20;
+}
+
+.contenidoCarta{
+background:linear-gradient(135deg,#ffb6e6,#ffd6f5);
+padding:40px;
+border-radius:20px;
+width:420px;
+text-align:center;
+color:#4a004a;
+box-shadow:0 0 30px rgba(255,105,180,0.6);
+animation:abrirCarta 0.6s ease;
+}
+
+#cerrarCarta{
+margin-top:20px;
+padding:10px 20px;
+border:none;
+background:#ff4da6;
+color:white;
+border-radius:20px;
+cursor:pointer;
+}
+
+@keyframes abrirCarta{
+from{
+transform:scale(0.5);
+opacity:0;
+}
+to{
+transform:scale(1);
+opacity:1;
+}
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>¡Feliz día de la mujer!</h1>
+<div class="emoji">💜 ✨ 🌸</div>
+
+<button id="btnCarta">💌 Ver mensaje</button>
+
+<!-- CARTA -->
+<div id="carta">
+<div class="contenidoCarta">
+
+<h2>Para ti 💜</h2>
+
+<p>
+Hoy celebramos tu fuerza, tu valentía y tu capacidad de iluminar el mundo.
+</p>
+
+<p>
+Tu esfuerzo, tus sueños y tu manera de enfrentar la vida hacen que todo
+a tu alrededor sea mejor.
+</p>
+
+<p>
+Nunca olvides lo valiosa que eres ni todo lo que puedes lograr.
+</p>
+
+<p>
+✨ ¡Feliz Día de la Mujer! ✨
+</p>
+
+<button id="cerrarCarta">Cerrar</button>
+
+</div>
+</div>
+
+<audio autoplay loop>
+<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_4f2c6e5f42.mp3" type="audio/mpeg">
+</audio>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+
+const scene = new THREE.Scene()
+
+const camera = new THREE.PerspectiveCamera(
+75,
+window.innerWidth/window.innerHeight,
+0.1,
+1000
+)
+
+camera.position.z = 22
+
+const renderer = new THREE.WebGLRenderer({antialias:true})
+renderer.setSize(window.innerWidth,window.innerHeight)
+document.body.appendChild(renderer.domElement)
+
+renderer.setPixelRatio(window.devicePixelRatio)
+
+////////////////////////
+// TEXTURA CORAZÓN
+////////////////////////
+
+function createHeartTexture(){
+
+const canvas = document.createElement("canvas")
+canvas.width = 64
+canvas.height = 64
+
+const ctx = canvas.getContext("2d")
+
+ctx.fillStyle = "#ff4da6"
+
+ctx.beginPath()
+ctx.moveTo(32,58)
+ctx.bezierCurveTo(60,35,60,15,32,25)
+ctx.bezierCurveTo(4,15,4,35,32,58)
+ctx.fill()
+
+return new THREE.CanvasTexture(canvas)
+
+}
+
+const heartTexture = createHeartTexture()
+
+////////////////////////
+// GALAXIA
+////////////////////////
+
+const count = 9000
+const radius = 5
+const branches = 5
+const spin = 4
+
+const geometry = new THREE.BufferGeometry()
+const positions = new Float32Array(count*3)
+
+for(let i=0;i<count;i++){
+
+const i3 = i*3
+
+const r = Math.random()*radius
+const spinAngle = r*spin
+const branchAngle = (i%branches)/branches*Math.PI*2
+
+positions[i3] =
+Math.cos(branchAngle+spinAngle)*r
+
+positions[i3+1] =
+(Math.random()-0.5)*0.5
+
+positions[i3+2] =
+Math.sin(branchAngle+spinAngle)*r
+
+}
+
+geometry.setAttribute(
+"position",
+new THREE.BufferAttribute(positions,3)
+)
+
+const material = new THREE.PointsMaterial({
+size:0.15,
+map:heartTexture,
+transparent:true,
+depthWrite:false,
+blending:THREE.AdditiveBlending
+})
+
+const hearts = new THREE.Points(geometry,material)
+scene.add(hearts)
+
+hearts.rotation.x = 0.7
+
+////////////////////////
+// ESTRELLAS
+////////////////////////
+
+const starsGeometry = new THREE.BufferGeometry()
+const starCount = 3000
+const starPositions = new Float32Array(starCount*3)
+
+for(let i=0;i<starCount*3;i++){
+starPositions[i]=(Math.random()-0.5)*80
+}
+
+starsGeometry.setAttribute(
+'position',
+new THREE.BufferAttribute(starPositions,3)
+)
+
+const starsMaterial = new THREE.PointsMaterial({ size:0.05 })
+const stars = new THREE.Points(starsGeometry,starsMaterial)
+
+scene.add(stars)
+
+////////////////////////
+// MOUSE / TOUCH
+////////////////////////
+
+let mouseX=0
+let mouseY=0
+
+document.addEventListener("mousemove",(event)=>{
+
+mouseX = (event.clientX/window.innerWidth)-0.5
+mouseY = (event.clientY/window.innerHeight)-0.5
+
+})
+
+document.addEventListener("touchmove",(event)=>{
+
+mouseX = (event.touches[0].clientX/window.innerWidth)-0.5
+mouseY = (event.touches[0].clientY/window.innerHeight)-0.5
+
+})
+
+////////////////////////
+// CINEMÁTICA
+////////////////////////
+
+let introTime = 0
+let introDuration = 4
+let introFinished = false
+
+////////////////////////
+// ANIMACION
+////////////////////////
+
+function animate(){
+
+requestAnimationFrame(animate)
+
+const pos = geometry.attributes.position.array
+const time = Date.now()*0.001
+
+for(let i=0;i<pos.length;i+=3){
+pos[i+1] += Math.sin(time + i)*0.0003
+}
+
+geometry.attributes.position.needsUpdate = true
+
+hearts.rotation.y += 0.002
+
+if(!introFinished){
+
+introTime += 0.02
+
+camera.position.z = 28 - introTime*4
+camera.position.y = Math.sin(introTime)*2
+
+camera.lookAt(scene.position)
+
+if(introTime > introDuration){
+introFinished = true
+}
+
+}else{
+
+camera.position.x += (mouseX*12 - camera.position.x)*0.08
+camera.position.y += (-mouseY*12 - camera.position.y)*0.08
+
+camera.lookAt(scene.position)
+
+}
+
+renderer.render(scene,camera)
+
+}
+
+animate()
+
+////////////////////////
+// RESPONSIVE
+////////////////////////
+
+window.addEventListener("resize",()=>{
+
+camera.aspect = window.innerWidth/window.innerHeight
+camera.updateProjectionMatrix()
+
+renderer.setSize(window.innerWidth,window.innerHeight)
+
+})
+
+////////////////////////
+// BOTON CARTA
+////////////////////////
+
+const btnCarta = document.getElementById("btnCarta")
+const carta = document.getElementById("carta")
+const cerrarCarta = document.getElementById("cerrarCarta")
+
+btnCarta.onclick = ()=>{
+carta.style.display = "flex"
+}
+
+cerrarCarta.onclick = ()=>{
+carta.style.display = "none"
+}
+
+</script>
+
+</body>
+</html>
